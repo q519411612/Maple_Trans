@@ -79,13 +79,9 @@ pub fn install_localization(path: String, mode: String) -> Result<OperationResul
         .resources
         .first()
         .ok_or_else(|| "manifest has no resources".to_owned())?;
+    let language_mode = parse_language_mode(&mode)?;
     let entries = load_entries(&mode)?;
     let backup_dir = app_backup_dir(&game_dir);
-    let language_mode = if mode == "zh-CN-bilingual" {
-        LanguageMode::Bilingual
-    } else {
-        LanguageMode::SimplifiedChinese
-    };
 
     let receipt = install_synthetic(InstallRequest {
         game_dir: &game_dir,
@@ -150,6 +146,7 @@ fn load_manifest() -> Result<Manifest, String> {
 }
 
 fn load_entries(mode: &str) -> Result<Vec<patch_core::translation::TranslationEntry>, String> {
+    parse_language_mode(mode)?;
     let path = project_root()
         .join("translations/maplelegends")
         .join(mode)
@@ -160,6 +157,14 @@ fn load_entries(mode: &str) -> Result<Vec<patch_core::translation::TranslationEn
 
 fn app_backup_dir(game_dir: &Path) -> PathBuf {
     game_dir.join(".open-maple-patch-backup")
+}
+
+fn parse_language_mode(mode: &str) -> Result<LanguageMode, String> {
+    match mode {
+        "zh-CN" => Ok(LanguageMode::SimplifiedChinese),
+        "zh-CN-bilingual" => Ok(LanguageMode::Bilingual),
+        other => Err(format!("unsupported language mode: {}", other)),
+    }
 }
 
 fn project_root() -> PathBuf {

@@ -81,6 +81,14 @@ fn validate_data(manifest_path: PathBuf, translations_path: PathBuf) -> Result<(
             resource.length_policy.clone(),
         )
         .map_err(|error| anyhow!(error))?;
+        validate_text_length(
+            TextTarget {
+                key: &entry.key,
+                text: &entry.bilingual,
+            },
+            resource.length_policy.clone(),
+        )
+        .map_err(|error| anyhow!(error))?;
     }
 
     println!("validation ok");
