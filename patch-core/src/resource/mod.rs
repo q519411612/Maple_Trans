@@ -1,8 +1,8 @@
 use crate::error::PatchResult;
 
-pub mod synthetic;
 pub mod export;
 pub mod key;
+pub mod synthetic;
 pub mod wz_img;
 
 pub trait ResourceText {
