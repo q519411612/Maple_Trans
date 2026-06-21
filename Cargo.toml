@@ -1,5 +1,5 @@
 [workspace]
-members = ["patch-core", "cli"]
+members = ["patch-core", "cli", "tauri-app/src-tauri"]
 resolver = "2"
 
 [workspace.package]

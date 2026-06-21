@@ -1,0 +1,16 @@
+[package]
+name = "open-maple-patch-tauri"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+patch-core = { path = "../../patch-core" }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+tauri = { version = "2", features = [] }
+toml.workspace = true
