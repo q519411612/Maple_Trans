@@ -1,6 +1,8 @@
-use patch_core::resource::export::{target_resources, ExportTextEntry};
+use patch_core::resource::export::{collect_export_entries, target_resources, ExportTextEntry};
 use patch_core::resource::export::{validate_export_client_dir, write_export_jsonl};
+use patch_core::resource::export::RawTextNode;
 use patch_core::resource::key::stable_text_key;
+use patch_core::resource::wz_img::read_img_text_nodes;
 use std::fs;
 
 #[test]
@@ -111,4 +113,41 @@ fn write_export_jsonl_sorts_entries_by_key() {
     let output = fs::read_to_string(path).unwrap();
 
     assert!(output.starts_with(r#"{"key":"string.eqp.01000001.name""#));
+}
+
+#[test]
+fn collect_export_entries_converts_known_text_nodes_to_entries() {
+    let nodes = vec![RawTextNode {
+        resource: "Data/String/Eqp.img".to_owned(),
+        path: "Eqp.img/01000001/name".to_owned(),
+        value: "Sample text".to_owned(),
+    }];
+
+    let entries = collect_export_entries(nodes).unwrap();
+
+    assert_eq!(entries[0].key, "string.eqp.01000001.name");
+    assert_eq!(entries[0].source, "Sample text");
+}
+
+#[test]
+fn collect_export_entries_reports_unknown_text_nodes() {
+    let nodes = vec![RawTextNode {
+        resource: "Data/String/Eqp.img".to_owned(),
+        path: "Eqp.img/01000001/icon".to_owned(),
+        value: "icon data".to_owned(),
+    }];
+
+    let error = collect_export_entries(nodes).unwrap_err();
+
+    assert!(error.to_string().contains("unsupported text field"));
+}
+
+#[test]
+fn read_img_text_nodes_reports_missing_resource() {
+    let temp = tempfile::tempdir().unwrap();
+    let target = target_resources()[0];
+
+    let error = read_img_text_nodes(temp.path(), target).unwrap_err();
+
+    assert!(error.to_string().contains("missing target resource"));
 }

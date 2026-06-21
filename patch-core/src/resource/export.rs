@@ -3,6 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::error::{PatchError, PatchResult};
+use crate::resource::key::stable_text_key;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TargetResource {
@@ -16,6 +17,13 @@ pub struct ExportTextEntry {
     pub source: String,
     pub resource: String,
     pub path: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RawTextNode {
+    pub resource: String,
+    pub path: String,
+    pub value: String,
 }
 
 const TARGET_RESOURCES: [TargetResource; 9] = [
@@ -118,4 +126,19 @@ pub fn write_export_jsonl(
     fs::write(&out_path, output)?;
 
     Ok(out_path)
+}
+
+pub fn collect_export_entries(nodes: Vec<RawTextNode>) -> PatchResult<Vec<ExportTextEntry>> {
+    nodes
+        .into_iter()
+        .map(|node| {
+            let key = stable_text_key(&node.resource, &node.path)?;
+            Ok(ExportTextEntry {
+                key,
+                source: node.value,
+                resource: node.resource,
+                path: node.path,
+            })
+        })
+        .collect()
 }
