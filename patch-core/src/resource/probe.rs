@@ -181,11 +181,20 @@ fn list_attempts(data: &[u8]) -> Vec<ProbeAttempt> {
     .into_iter()
     .map(
         |(mode, version)| match parse_list_file_with_iv(data, version.iv()) {
-            Ok(entries) => ProbeAttempt {
+            Ok(entries) if list_entries_are_plausible(&entries) => ProbeAttempt {
                 mode: mode.to_owned(),
                 status: ProbeStatus::Readable,
                 detail: format!(
                     "entries={} first={}",
+                    entries.len(),
+                    entries.first().map_or("", String::as_str)
+                ),
+            },
+            Ok(entries) => ProbeAttempt {
+                mode: mode.to_owned(),
+                status: ProbeStatus::Failed,
+                detail: format!(
+                    "entries={} first={} validation=not_plausible",
                     entries.len(),
                     entries.first().map_or("", String::as_str)
                 ),
@@ -249,4 +258,12 @@ fn img_attempts(path: &Path) -> Vec<ProbeAttempt> {
     );
 
     attempts
+}
+
+pub fn list_entries_are_plausible(entries: &[String]) -> bool {
+    entries.first().is_some_and(|entry| entry == "dummy")
+        && entries.iter().any(|entry| {
+            let lower = entry.to_ascii_lowercase();
+            lower.contains('/') && lower.ends_with(".img")
+        })
 }

@@ -1,5 +1,6 @@
 use patch_core::resource::probe::{
-    format_magic, probe_client, ListProbe, ProbeAttempt, ProbeReport, ProbeStatus, ResourceProbe,
+    format_magic, list_entries_are_plausible, probe_client, ListProbe, ProbeAttempt, ProbeReport,
+    ProbeStatus, ResourceProbe,
 };
 
 #[test]
@@ -60,4 +61,13 @@ fn probe_client_reports_missing_files_without_aborting() {
         .resources
         .iter()
         .all(|resource| resource.status() == ProbeStatus::Missing));
+}
+
+#[test]
+fn list_entries_are_plausible_requires_dummy_and_img_paths() {
+    let good = vec!["dummy".to_owned(), "mob/0100100.img".to_owned()];
+    let bad = vec!["쭙ꄃ㝂髧ට".to_owned(), "not-a-path".to_owned()];
+
+    assert!(list_entries_are_plausible(&good));
+    assert!(!list_entries_are_plausible(&bad));
 }
