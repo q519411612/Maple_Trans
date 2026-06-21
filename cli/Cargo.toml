@@ -9,3 +9,4 @@ repository.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 patch-core = { path = "../patch-core" }
+toml.workspace = true

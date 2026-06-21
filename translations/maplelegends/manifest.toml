@@ -1,0 +1,10 @@
+game = "maplelegends"
+supported_client_versions = ["synthetic-001"]
+modes = ["zh-CN", "zh-CN-bilingual"]
+
+[[resources]]
+id = "string-item"
+source = "String/Item.synthetic.json"
+kind = "item"
+hash = "acfc65287e39cb6493f08b0a57de86565aa889ae1aaf2b78a12118b617d4ff9f"
+length_policy = "strict-name"
