@@ -8,6 +8,10 @@ This project does not distribute MapleLegends client files. This project does no
 
 The repository contains code, translation data, manifests, and synthetic test fixtures only. Do not upload original or modified MapleLegends resource files.
 
+## Contributing
+
+Read [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) before submitting code or translation data.
+
 ## Local Development
 
 ```bash

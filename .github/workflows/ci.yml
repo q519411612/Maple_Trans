@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --check
+      - run: cargo test --workspace
+      - run: cargo run -p omp-cli -- validate-data --manifest translations/maplelegends/manifest.toml --translations translations/maplelegends/zh-CN/item.jsonl
+      - run: cargo run -p omp-cli -- dry-run --game-dir fixtures/synthetic-client --manifest translations/maplelegends/manifest.toml --translations translations/maplelegends/zh-CN/item.jsonl
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tauri-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: tauri-app/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run
+      - run: pnpm build
