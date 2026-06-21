@@ -10,6 +10,7 @@ use patch_core::plan::{build_patch_plan, LanguageMode};
 use patch_core::resource::export::{
     collect_export_entries, target_resources, validate_export_client_dir, write_export_jsonl,
 };
+use patch_core::resource::probe::probe_client;
 use patch_core::resource::wz_img::read_img_text_nodes;
 use patch_core::translation::parse_jsonl;
 
@@ -45,6 +46,10 @@ pub enum Command {
         #[arg(long)]
         out: PathBuf,
     },
+    ProbeClient {
+        #[arg(long)]
+        game_dir: PathBuf,
+    },
 }
 
 pub fn run(cli: Cli) -> Result<()> {
@@ -60,6 +65,7 @@ pub fn run(cli: Cli) -> Result<()> {
             developer,
         } => dry_run(game_dir, manifest, translations, developer),
         Command::ExportText { game_dir, out } => export_text(game_dir, out),
+        Command::ProbeClient { game_dir } => probe_client_command(game_dir),
     }
 }
 
@@ -159,5 +165,13 @@ fn export_text(game_dir: PathBuf, out_dir: PathBuf) -> Result<()> {
         target_resources().len(),
         total_entries
     );
+    Ok(())
+}
+
+fn probe_client_command(game_dir: PathBuf) -> Result<()> {
+    let report = probe_client(&game_dir).map_err(|error| anyhow!(error))?;
+    let output =
+        serde_json::to_string_pretty(&report).context("cannot serialize client probe report")?;
+    println!("{output}");
     Ok(())
 }

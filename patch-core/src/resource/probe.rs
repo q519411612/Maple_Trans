@@ -4,9 +4,7 @@ use std::path::Path;
 
 use wz_reader::util::version::WzMapleVersion;
 use wz_reader::WzNode;
-use wzlib_rs::{
-    parse_list_file_with_iv, WzMapleVersion as WzLibMapleVersion,
-};
+use wzlib_rs::{parse_list_file_with_iv, WzMapleVersion as WzLibMapleVersion};
 
 use crate::error::PatchResult;
 use crate::hash::sha256_file_hex;
@@ -181,22 +179,24 @@ fn list_attempts(data: &[u8]) -> Vec<ProbeAttempt> {
         ("BMS", WzLibMapleVersion::Bms),
     ]
     .into_iter()
-    .map(|(mode, version)| match parse_list_file_with_iv(data, version.iv()) {
-        Ok(entries) => ProbeAttempt {
-            mode: mode.to_owned(),
-            status: ProbeStatus::Readable,
-            detail: format!(
-                "entries={} first={}",
-                entries.len(),
-                entries.first().map_or("", String::as_str)
-            ),
+    .map(
+        |(mode, version)| match parse_list_file_with_iv(data, version.iv()) {
+            Ok(entries) => ProbeAttempt {
+                mode: mode.to_owned(),
+                status: ProbeStatus::Readable,
+                detail: format!(
+                    "entries={} first={}",
+                    entries.len(),
+                    entries.first().map_or("", String::as_str)
+                ),
+            },
+            Err(error) => ProbeAttempt {
+                mode: mode.to_owned(),
+                status: ProbeStatus::Failed,
+                detail: error.to_string(),
+            },
         },
-        Err(error) => ProbeAttempt {
-            mode: mode.to_owned(),
-            status: ProbeStatus::Failed,
-            detail: error.to_string(),
-        },
-    })
+    )
     .collect()
 }
 
@@ -215,34 +215,38 @@ fn img_attempts(path: &Path) -> Vec<ProbeAttempt> {
 
     let mut attempts = version_attempts
         .into_iter()
-        .map(|(mode, version)| match WzNode::from_img_file(path, version, None) {
-            Ok(node) => ProbeAttempt {
-                mode: mode.to_owned(),
-                status: ProbeStatus::Readable,
-                detail: format!("root={}", node.name),
+        .map(
+            |(mode, version)| match WzNode::from_img_file(path, version, None) {
+                Ok(node) => ProbeAttempt {
+                    mode: mode.to_owned(),
+                    status: ProbeStatus::Readable,
+                    detail: format!("root={}", node.name),
+                },
+                Err(error) => ProbeAttempt {
+                    mode: mode.to_owned(),
+                    status: ProbeStatus::Failed,
+                    detail: error.to_string(),
+                },
             },
-            Err(error) => ProbeAttempt {
-                mode: mode.to_owned(),
-                status: ProbeStatus::Failed,
-                detail: error.to_string(),
-            },
-        })
+        )
         .collect::<Vec<_>>();
 
-    attempts.extend(iv_attempts.into_iter().map(|(mode, iv)| {
-        match WzNode::from_img_file_with_iv(path, iv, None) {
-            Ok(node) => ProbeAttempt {
-                mode: mode.to_owned(),
-                status: ProbeStatus::Readable,
-                detail: format!("root={}", node.name),
-            },
-            Err(error) => ProbeAttempt {
-                mode: mode.to_owned(),
-                status: ProbeStatus::Failed,
-                detail: error.to_string(),
-            },
-        }
-    }));
+    attempts.extend(
+        iv_attempts.into_iter().map(|(mode, iv)| {
+            match WzNode::from_img_file_with_iv(path, iv, None) {
+                Ok(node) => ProbeAttempt {
+                    mode: mode.to_owned(),
+                    status: ProbeStatus::Readable,
+                    detail: format!("root={}", node.name),
+                },
+                Err(error) => ProbeAttempt {
+                    mode: mode.to_owned(),
+                    status: ProbeStatus::Failed,
+                    detail: error.to_string(),
+                },
+            }
+        }),
+    );
 
     attempts
 }

@@ -2262,6 +2262,7 @@ dependencies = [
  "anyhow",
  "clap",
  "patch-core",
+ "serde_json",
  "toml 0.8.23",
 ]
 

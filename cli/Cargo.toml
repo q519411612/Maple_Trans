@@ -9,4 +9,5 @@ repository.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 patch-core = { path = "../patch-core" }
+serde_json.workspace = true
 toml.workspace = true
