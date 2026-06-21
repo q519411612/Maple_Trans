@@ -212,3 +212,23 @@ These decisions should be made after the first read-only traversal succeeds:
 - Whether map, skill, and quest descriptions need separate length policies.
 - Whether bilingual data should be generated from one entry or stored explicitly per resource kind.
 - Whether `Data/Quest/Say.img` should remain excluded permanently or become an opt-in diagnostic-only export.
+
+## Manual Probe Finding
+
+The first read-only probe against the user-provided MapleLegendsHD client reached the standalone `.img` parser but did not complete.
+
+Observed behavior:
+
+- `wz_reader` can open the target file path but cannot auto-detect the image version.
+- Explicit `GMS`, `EMS`, and `BMS` version attempts all fail with a wrong-version error.
+- Fixed IV attempts using zero, GMS, and MSEA IVs also fail.
+- `wzlib-rs` can parse `list.wz` with the GMS IV and returns readable paths, but its hotfix image parser also does not parse `Data/String/Eqp.img` with known IVs.
+- Client file hashes before and after the failed probe match exactly.
+
+Current conclusion:
+
+MapleLegendsHD standalone `.img` files appear to require MapleLegends-specific encryption parameters or a compatible parser beyond the default public `GMS`, `EMS`, and `BMS` IV modes. The project should not guess or brute-force this. The next resource-adaptation slice needs one of:
+
+- A documented compatible open-source parser path.
+- The correct non-secret parser configuration if it is safe to publish.
+- A user-generated local text export that can be used to start translation data without distributing client resources.
