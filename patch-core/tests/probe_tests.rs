@@ -1,5 +1,5 @@
 use patch_core::resource::probe::{
-    format_magic, ListProbe, ProbeAttempt, ProbeReport, ProbeStatus, ResourceProbe,
+    format_magic, probe_client, ListProbe, ProbeAttempt, ProbeReport, ProbeStatus, ResourceProbe,
 };
 
 #[test]
@@ -45,4 +45,19 @@ fn probe_report_serializes_deterministic_json() {
         json,
         r#"{"client_root":"/client","executable_exists":true,"list":{"path":"list.wz","exists":true,"sha256":"hash","magic":"01 02","attempts":[{"mode":"GMS","status":"readable","detail":"entries=371 first=dummy"}]},"resources":[{"id":"string-eqp","path":"Data/String/Eqp.img","exists":true,"sha256":"resource-hash","magic":"73 f8","attempts":[{"mode":"auto","status":"failed","detail":"Unable to guess version"}]}]}"#
     );
+}
+
+#[test]
+fn probe_client_reports_missing_files_without_aborting() {
+    let temp = tempfile::tempdir().unwrap();
+
+    let report = probe_client(temp.path()).unwrap();
+
+    assert!(!report.executable_exists);
+    assert_eq!(report.list.status(), ProbeStatus::Missing);
+    assert_eq!(report.resources.len(), 9);
+    assert!(report
+        .resources
+        .iter()
+        .all(|resource| resource.status() == ProbeStatus::Missing));
 }

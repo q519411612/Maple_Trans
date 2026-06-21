@@ -2361,6 +2361,7 @@ dependencies = [
  "thiserror 1.0.69",
  "toml 0.8.23",
  "wz_reader",
+ "wzlib-rs",
 ]
 
 [[package]]
@@ -4672,6 +4673,21 @@ dependencies = [
  "scroll",
  "texture2ddecoder",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "wzlib-rs"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08b90dc932e6f7c718e8245ef2a2183c48d163483eb320ede722e4ff657029e1"
+dependencies = [
+ "aes",
+ "cipher 0.4.4",
+ "flate2",
+ "serde",
+ "serde_json",
+ "texture2ddecoder",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

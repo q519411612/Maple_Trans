@@ -18,3 +18,4 @@ thiserror = "1"
 toml = "0.8"
 flate2 = { version = "1.1.9", default-features = false, features = ["rust_backend"] }
 wz_reader = { version = "0.0.21", default-features = false }
+wzlib-rs = "0.1.4"
