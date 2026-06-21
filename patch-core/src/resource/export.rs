@@ -1,3 +1,7 @@
+use std::collections::BTreeSet;
+use std::fs;
+use std::path::{Path, PathBuf};
+
 use crate::error::{PatchError, PatchResult};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,4 +66,56 @@ impl ExportTextEntry {
 
 pub fn target_resources() -> &'static [TargetResource] {
     &TARGET_RESOURCES
+}
+
+pub fn validate_export_client_dir(game_dir: &Path) -> PatchResult<()> {
+    let executable = game_dir.join("MapleLegends.exe");
+    if !executable.is_file() {
+        return Err(PatchError::Validation(format!(
+            "missing MapleLegends.exe: {}",
+            executable.display()
+        )));
+    }
+
+    for resource in target_resources() {
+        let resource_path = game_dir.join(resource.relative_path);
+        if !resource_path.is_file() {
+            return Err(PatchError::Validation(format!(
+                "missing target resource: {}",
+                resource_path.display()
+            )));
+        }
+    }
+
+    Ok(())
+}
+
+pub fn write_export_jsonl(
+    out_dir: &Path,
+    file_name: &str,
+    entries: &[ExportTextEntry],
+) -> PatchResult<PathBuf> {
+    let mut seen = BTreeSet::new();
+    for entry in entries {
+        if !seen.insert(&entry.key) {
+            return Err(PatchError::Validation(format!(
+                "duplicate export key: {}",
+                entry.key
+            )));
+        }
+    }
+
+    let mut sorted = entries.iter().collect::<Vec<_>>();
+    sorted.sort_by(|left, right| left.key.cmp(&right.key));
+
+    fs::create_dir_all(out_dir)?;
+    let out_path = out_dir.join(file_name);
+    let mut output = String::new();
+    for entry in sorted {
+        output.push_str(&entry.to_json_line()?);
+        output.push('\n');
+    }
+    fs::write(&out_path, output)?;
+
+    Ok(out_path)
 }
