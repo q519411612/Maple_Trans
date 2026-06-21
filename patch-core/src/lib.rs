@@ -8,5 +8,6 @@ pub mod plan;
 pub mod resource;
 pub mod restore;
 pub mod translation;
+pub mod update;
 
 pub use error::{PatchError, PatchResult};
