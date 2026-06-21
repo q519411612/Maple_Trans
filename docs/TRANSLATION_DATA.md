@@ -10,7 +10,7 @@ The repository uses:
 Example entry:
 
 ```json
-{"key":"item.2000000.name","source":"Red Potion","zh_CN":"红色药水","bilingual":"红色药水 / Red Potion","status":"reviewed"}
+{"key":"item.2000000.name","source":"Red Potion","zh_CN":"红色药水","bilingual":"红药/Red","status":"reviewed"}
 ```
 
 Rules:
