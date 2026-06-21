@@ -116,10 +116,6 @@ fn dry_run(
 
     let plan = build_patch_plan(resource, &entries, LanguageMode::SimplifiedChinese)
         .map_err(|error| anyhow!(error))?;
-    println!(
-        "dry run ok: {} edits for {}",
-        plan.edits.len(),
-        plan.source
-    );
+    println!("dry run ok: {} edits for {}", plan.edits.len(), plan.source);
     Ok(())
 }

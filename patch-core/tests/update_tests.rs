@@ -27,9 +27,7 @@ fn rejects_client_resource_assets() {
         }],
     };
 
-    let error = validate_update_manifest(&manifest)
-        .unwrap_err()
-        .to_string();
+    let error = validate_update_manifest(&manifest).unwrap_err().to_string();
 
     assert!(error.contains("client resource asset"));
 }

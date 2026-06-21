@@ -95,7 +95,10 @@ pub fn install_localization(path: String, mode: String) -> Result<OperationResul
 
     Ok(OperationResult {
         ok: true,
-        message: format!("installed localization for {}", receipt.changed_files.join(", ")),
+        message: format!(
+            "installed localization for {}",
+            receipt.changed_files.join(", ")
+        ),
         backup_path: Some(backup_dir.display().to_string()),
     })
 }

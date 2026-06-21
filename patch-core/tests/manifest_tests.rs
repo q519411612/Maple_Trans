@@ -21,5 +21,8 @@ length_policy = "strict-name"
     assert_eq!(manifest.supported_client_versions, vec!["synthetic-001"]);
     assert_eq!(manifest.modes, vec!["zh-CN", "zh-CN-bilingual"]);
     assert_eq!(manifest.resources[0].kind, ResourceKind::Item);
-    assert_eq!(manifest.resources[0].length_policy, LengthPolicy::StrictName);
+    assert_eq!(
+        manifest.resources[0].length_policy,
+        LengthPolicy::StrictName
+    );
 }

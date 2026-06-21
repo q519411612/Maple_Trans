@@ -7,7 +7,7 @@ use patch_core::translation::{ReviewStatus, TranslationEntry};
 #[test]
 fn reads_and_writes_synthetic_resource_text() {
     let input = r#"{"item.2000000.name":"Red Potion"}"#;
-    let mut resource = SyntheticResource::from_str(input).unwrap();
+    let mut resource = input.parse::<SyntheticResource>().unwrap();
 
     resource.set_text("item.2000000.name", "红色药水").unwrap();
     let output = resource.to_string_pretty().unwrap();

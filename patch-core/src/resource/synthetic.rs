@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::str::FromStr;
 
 use crate::error::{PatchError, PatchResult};
 use crate::resource::ResourceText;
@@ -9,17 +10,21 @@ pub struct SyntheticResource {
 }
 
 impl SyntheticResource {
-    pub fn from_str(input: &str) -> PatchResult<Self> {
-        let values = serde_json::from_str(input).map_err(|error| {
-            PatchError::Validation(format!("invalid synthetic resource: {}", error))
-        })?;
-        Ok(Self { values })
-    }
-
     pub fn to_string_pretty(&self) -> PatchResult<String> {
         serde_json::to_string_pretty(&self.values).map_err(|error| {
             PatchError::Validation(format!("cannot write synthetic resource: {}", error))
         })
+    }
+}
+
+impl FromStr for SyntheticResource {
+    type Err = PatchError;
+
+    fn from_str(input: &str) -> PatchResult<Self> {
+        let values = serde_json::from_str(input).map_err(|error| {
+            PatchError::Validation(format!("invalid synthetic resource: {}", error))
+        })?;
+        Ok(Self { values })
     }
 }
 

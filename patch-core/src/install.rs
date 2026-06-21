@@ -41,7 +41,7 @@ pub fn install_synthetic(request: InstallRequest<'_>) -> PatchResult<InstallRece
 
     let plan = build_patch_plan(request.resource, request.entries, request.language_mode)?;
     let input = fs::read_to_string(&target)?;
-    let mut resource = SyntheticResource::from_str(&input)?;
+    let mut resource = input.parse::<SyntheticResource>()?;
     for edit in &plan.edits {
         resource.set_text(&edit.key, &edit.replacement)?;
     }
